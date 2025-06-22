@@ -406,19 +406,29 @@
 
         function handleDragEnter(e) {
             e.preventDefault();
-            e.target.classList.add('drag-over');
+            const dropTarget = e.target.closest('.category-content');
+            if (dropTarget) {
+                dropTarget.classList.add('drag-over');
+            }
         }
 
         function handleDragLeave(e) {
-            e.target.classList.remove('drag-over');
+            const dropTarget = e.target.closest('.category-content');
+            // Only remove drag-over if we're actually leaving the drop zone
+            if (dropTarget && !dropTarget.contains(e.relatedTarget)) {
+                dropTarget.classList.remove('drag-over');
+            }
         }
 
         function handleDrop(e) {
             e.preventDefault();
-            e.target.classList.remove('drag-over');
+            const dropTarget = e.target.closest('.category-content');
+            if (dropTarget) {
+                dropTarget.classList.remove('drag-over');
+            }
             
-            if (draggedElement && e.target.classList.contains('category-content')) {
-                e.target.appendChild(draggedElement);
+            if (draggedElement && dropTarget) {
+                dropTarget.appendChild(draggedElement);
                 updateCounters();
                 updateResults();
             }
