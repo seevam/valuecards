@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Values Card Sort Activity</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4CAF50, #2E7D32);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+
+        .instructions {
+            background: #f8f9fa;
+            padding: 25px;
+            border-bottom: 3px solid #e9ecef;
+        }
+
+        .instructions h2 {
+            color: #2E7D32;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .instructions ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .instructions li {
+            margin: 10px 0;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid #4CAF50;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .main-content {
+            padding: 30px;
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+        }
+
+        .values-section {
+            background: #fff;
+        }
+
+        .categories-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+
+        .values-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .value-card {
+            background: linear-gradient(135deg, #fff, #f8f9fa);
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            cursor: grab;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+            user-select: none;
+        }
+
+        .value-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            border-color: #4CAF50;
+        }
+
+        .value-card:active {
+            cursor: grabbing;
+            transform: scale(0.98);
+        }
+
+        .value-card h3 {
+            font-size: 1.2em;
+            margin-bottom: 8px;
+            color: #2E7D32;
+            font-weight: 600;
+        }
+
+        .value-card p {
+            font-size: 0.9em;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        .category {
+            margin-bottom: 25px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+        }
+
+        .category-header {
+            padding: 15px 20px;
+            font-weight: 600;
+            font-size: 1.1em;
+            text-align: center;
+            color: white;
+        }
+
+        .always-true { background: #4CAF50; }
+        .sometimes-important { background: #FF9800; }
+        .not-so-much { background: #f44336; }
+
+        .category-content {
+            min-height: 120px;
+            padding: 15px;
+            background: white;
+            border: 2px dashed #e9ecef;
+            transition: all 0.3s ease;
+        }
+
+        .category-content.drag-over {
+            border-color: #4CAF50;
+            background: #f1f8e9;
+        }
+
+        .category-content .value-card {
+            margin: 8px 0;
+            background: linear-gradient(135deg, #e8f5e8, #f1f8e9);
+            border-color: #4CAF50;
+            opacity: 0.9;
+        }
+
+        .category-content .value-card h3 {
+            font-size: 1em;
+        }
+
+        .category-content .value-card p {
+            font-size: 0.8em;
+        }
+
+        .results-section {
+            margin-top: 30px;
+            padding: 25px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            grid-column: 1 / -1;
+        }
+
+        .results-section h2 {
+            color: #2E7D32;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .result-category {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+        }
+
+        .result-category h3 {
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .reset-btn {
+            background: linear-gradient(135deg, #FF9800, #F57F17);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+            display: block;
+            margin: 20px auto 0;
+        }
+
+        .reset-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255,152,0,0.3);
+        }
+
+        .counter {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .values-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 10px;
+            }
+            
+            .value-card {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Values Card Sort Activity</h1>
+            <p>Discover what matters most to you by sorting these values into three categories. This will help connect your personality to your career aspirations.</p>
+        </div>
+
+        <div class="instructions">
+            <h2>How to Use This Activity</h2>
+            <ul>
+                <li><strong>Step 1:</strong> Read each value card carefully and think about how important it is to you personally</li>
+                <li><strong>Step 2:</strong> Drag and drop each card into one of the three categories on the right</li>
+                <li><strong>Step 3:</strong> Be honest - there are no right or wrong answers, only what's true for you</li>
+                <li><strong>Step 4:</strong> Review your sorted values and discuss patterns with your mentor</li>
+            </ul>
+        </div>
+
+        <div class="main-content">
+            <div class="values-section">
+                <div class="values-grid" id="valuesGrid">
+                    <!-- Values will be populated by JavaScript -->
+                </div>
+                <button class="reset-btn" onclick="resetActivity()">Reset All Cards</button>
+            </div>
+
+            <div class="categories-section">
+                <div class="category">
+                    <div class="category-header always-true">Always True for Me</div>
+                    <div class="category-content" data-category="always-true">
+                        <div class="counter">Cards here: <span id="always-count">0</span></div>
+                    </div>
+                </div>
+
+                <div class="category">
+                    <div class="category-header sometimes-important">Sometimes Important</div>
+                    <div class="category-content" data-category="sometimes-important">
+                        <div class="counter">Cards here: <span id="sometimes-count">0</span></div>
+                    </div>
+                </div>
+
+                <div class="category">
+                    <div class="category-header not-so-much">Not So Much</div>
+                    <div class="category-content" data-category="not-so-much">
+                        <div class="counter">Cards here: <span id="not-count">0</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="results-section">
+            <h2>Your Values Summary</h2>
+            <div class="results-grid">
+                <div class="result-category">
+                    <h3 style="color: #4CAF50;">Core Values (Always True)</h3>
+                    <div id="results-always"></div>
+                </div>
+                <div class="result-category">
+                    <h3 style="color: #FF9800;">Situational Values (Sometimes Important)</h3>
+                    <div id="results-sometimes"></div>
+                </div>
+                <div class="result-category">
+                    <h3 style="color: #f44336;">Lower Priority (Not So Much)</h3>
+                    <div id="results-not"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const values = [
+            { name: "Achievement", description: "Accomplishing goals and succeeding" },
+            { name: "Adventure", description: "Seeking new experiences and challenges" },
+            { name: "Authenticity", description: "Being true to yourself" },
+            { name: "Creativity", description: "Expressing imagination and innovation" },
+            { name: "Independence", description: "Self-reliance and autonomy" },
+            { name: "Learning", description: "Continuous growth and knowledge" },
+            { name: "Helping Others", description: "Making a positive impact on people" },
+            { name: "Stability", description: "Predictability and security" },
+            { name: "Leadership", description: "Guiding and inspiring others" },
+            { name: "Recognition", description: "Being acknowledged for contributions" },
+            { name: "Work-Life Balance", description: "Harmony between personal and professional life" },
+            { name: "Innovation", description: "Creating new solutions and ideas" },
+            { name: "Teamwork", description: "Collaborating effectively with others" },
+            { name: "Precision", description: "Attention to detail and accuracy" },
+            { name: "Freedom", description: "Having choice and flexibility" },
+            { name: "Responsibility", description: "Being accountable and reliable" },
+            { name: "Competition", description: "Striving to win and excel" },
+            { name: "Community", description: "Building connections and belonging" },
+            { name: "Quality", description: "Doing excellent work" },
+            { name: "Variety", description: "Experiencing different tasks and environments" },
+            { name: "Financial Security", description: "Economic stability and comfort" },
+            { name: "Mentoring", description: "Developing others' potential" },
+            { name: "Problem Solving", description: "Finding solutions to challenges" },
+            { name: "Tradition", description: "Respecting established ways and customs" },
+            { name: "Efficiency", description: "Getting things done effectively" },
+            { name: "Respect", description: "Being valued and honored by others" },
+            { name: "Growth", description: "Personal and professional development" },
+            { name: "Purpose", description: "Having meaningful work and life" },
+            { name: "Structure", description: "Clear organization and processes" },
+            { name: "Flexibility", description: "Adaptability and openness to change" }
+        ];
+
+        let draggedElement = null;
+
+        function createValueCard(value) {
+            const card = document.createElement('div');
+            card.className = 'value-card';
+            card.draggable = true;
+            card.innerHTML = `
+                <h3>${value.name}</h3>
+                <p>${value.description}</p>
+            `;
+            
+            card.addEventListener('dragstart', handleDragStart);
+            card.addEventListener('dragend', handleDragEnd);
+            
+            return card;
+        }
+
+        function handleDragStart(e) {
+            draggedElement = e.target;
+            e.target.style.opacity = '0.5';
+        }
+
+        function handleDragEnd(e) {
+            e.target.style.opacity = '';
+            draggedElement = null;
+        }
+
+        function setupDropZones() {
+            const dropZones = document.querySelectorAll('.category-content');
+            
+            dropZones.forEach(zone => {
+                zone.addEventListener('dragover', handleDragOver);
+                zone.addEventListener('drop', handleDrop);
+                zone.addEventListener('dragenter', handleDragEnter);
+                zone.addEventListener('dragleave', handleDragLeave);
+            });
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+        }
+
+        function handleDragEnter(e) {
+            e.preventDefault();
+            e.target.classList.add('drag-over');
+        }
+
+        function handleDragLeave(e) {
+            e.target.classList.remove('drag-over');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            e.target.classList.remove('drag-over');
+            
+            if (draggedElement && e.target.classList.contains('category-content')) {
+                e.target.appendChild(draggedElement);
+                updateCounters();
+                updateResults();
+            }
+        }
+
+        function updateCounters() {
+            const categories = ['always-true', 'sometimes-important', 'not-so-much'];
+            categories.forEach(category => {
+                const content = document.querySelector(`[data-category="${category}"]`);
+                const count = content.querySelectorAll('.value-card').length;
+                const countElement = content.querySelector('.counter span');
+                if (countElement) {
+                    countElement.textContent = count;
+                }
+            });
+        }
+
+        function updateResults() {
+            const categories = {
+                'always-true': 'results-always',
+                'sometimes-important': 'results-sometimes',
+                'not-so-much': 'results-not'
+            };
+
+            Object.entries(categories).forEach(([category, resultId]) => {
+                const content = document.querySelector(`[data-category="${category}"]`);
+                const cards = content.querySelectorAll('.value-card');
+                const resultDiv = document.getElementById(resultId);
+                
+                if (cards.length > 0) {
+                    const valuesList = Array.from(cards).map(card => 
+                        card.querySelector('h3').textContent
+                    ).join(', ');
+                    resultDiv.innerHTML = `<p><strong>${cards.length} values:</strong> ${valuesList}</p>`;
+                } else {
+                    resultDiv.innerHTML = '<p><em>No values selected yet</em></p>';
+                }
+            });
+        }
+
+        function resetActivity() {
+            const valuesGrid = document.getElementById('valuesGrid');
+            const allCards = document.querySelectorAll('.value-card');
+            
+            allCards.forEach(card => {
+                valuesGrid.appendChild(card);
+            });
+            
+            updateCounters();
+            updateResults();
+        }
+
+        function initializeActivity() {
+            const valuesGrid = document.getElementById('valuesGrid');
+            
+            // Shuffle values for variety
+            const shuffledValues = [...values].sort(() => Math.random() - 0.5);
+            
+            shuffledValues.forEach(value => {
+                const card = createValueCard(value);
+                valuesGrid.appendChild(card);
+            });
+            
+            setupDropZones();
+            updateCounters();
+            updateResults();
+        }
+
+        // Initialize the activity when the page loads
+        document.addEventListener('DOMContentLoaded', initializeActivity);
+    </script>
+</body>
+</html>
